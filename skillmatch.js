@@ -1,10 +1,4 @@
-const candidato = {
-    nome: "Davi dos Reis",
-    idade: 35,
-    area: "desenvolvedor Front-end",
-    experiencia: "1 ano",
-    habilidades: ["Javascript", "HTML", "CSS"]
-}//objeto candidato e informações
+
 const vagas = [
   { empresa: "Nubank",
     cargo: "Front-End Jr",
@@ -42,3 +36,32 @@ async function iniciarSimulador() {
     console.error("Falha ao iniciar o sistema:" + e,);//caso dê erro mostra essa mensagem
   }
 }
+class Candidato {
+  constructor(nome, idade, area, experiencia, habilidades) {
+    this.nome = nome;
+    this.idade = idade;
+    this.area = area;
+    this.experiencia = experiencia;
+    this.habilidades = habilidades;
+  }
+
+  apresentar() {
+    console.log(`Olá, sou ${this.nome}, tenho ${this.idade} anos e sou ${this.area}.`);//método que faz a apresentação do candidato
+  }
+}
+
+class CandidatoFrontEnd extends Candidato {
+  constructor(nome, idade, area, experiencia, habilidades, portfolio) {
+    super(nome, idade, area, experiencia, habilidades);
+    this.portfolio = portfolio;
+  }
+}
+const davi = new CandidatoFrontEnd(
+  "Davi dos Reis",
+  35,
+  "desenvolvedor Front-end",
+  "1 ano",
+  ["Javascript", "HTML", "CSS"],
+  "https://github.com/davidosreisdalcastagne"
+);//nova instância da classe CandidatoFrontEnd comsuas informações
+davi.apresentar(); // Chama o método apresentar() da instância 'davi'

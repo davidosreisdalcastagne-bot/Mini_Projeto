@@ -4,7 +4,7 @@ const candidato = {
     area: "desenvolvedor Front-end",
     experiencia: "1 ano",
     habilidades: ["Javascript", "HTML", "CSS"]
-}
+}//objeto candidato e informações
 const vagas = [
   { empresa: "Nubank",
     cargo: "Front-End Jr",
@@ -17,4 +17,28 @@ const vagas = [
   { empresa: "Mercado Livre",
     cargo: "Web Jr",
     requisitos: ["HTML", "JavaScript", "CSS", "React"] }
-];
+];//array das vagas com as informações de cada empresa
+ 
+function buscarVagasDoServidor() {
+  return new Promise((resolve, reject) => {
+    console.log("Buscando vagas no servidor...");// se a busca der certo mostra essa mensagem
+    setTimeout(() => {
+      if (vagas && vagas.length > 0) {
+        resolve(vagas); // Retorna o array de vagas criado acima
+      } else {
+        reject("Erro: Não foi possível carregar as vagas do servidor.");//caso dê erro mostra essa mensagem
+      }
+    }, 2000);
+  });
+}
+
+async function iniciarSimulador() {
+  try {
+    const vagasCarregadas = await buscarVagasDoServidor();
+    console.log("Vagas carregadas com sucesso! Total de vagas:", vagasCarregadas.length);
+    console.log(vagasCarregadas);
+
+  } catch (e) {
+    console.error("Falha ao iniciar o sistema:" + e,);//caso dê erro mostra essa mensagem
+  }
+}

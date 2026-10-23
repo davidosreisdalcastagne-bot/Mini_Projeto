@@ -65,3 +65,15 @@ const davi = new CandidatoFrontEnd(
   "https://github.com/davidosreisdalcastagne"
 );//nova instância da classe CandidatoFrontEnd comsuas informações
 davi.apresentar(); // Chama o método apresentar() da instância 'davi'
+
+let porcentagemDoCandidato = 0;// cria contador que armazena a quantidades de requisitos preenchidos
+//Analisa cada requisito da vaga individualmente
+combatibilidadeDoCandidato.forEach(requisitos => {
+  if(this.habilidades.includes(requisitos )) {
+porcentagemDoCandidato++;// Incrementa o contador em +1
+  }
+});
+
+const porcentagem = (porcentagemDoCandidato / combatibilidadeDoCandidato.length) * 100;// Calcula a proporção em formato de percentual
+
+return `${porcentagem.toFixed(0)}%`;

@@ -74,6 +74,21 @@ porcentagemDoCandidato++;// Incrementa o contador em +1
   }
 });
 
-const porcentagem = (porcentagemDoCandidato / combatibilidadeDoCandidato.length) * 100;// Calcula a proporção em formato de percentual
+if (nota >= 80) {
+  mencao = "Alta";
+} else if (nota >= 50) {
+  mencao = "Média";
+} else {
+  mencao = "Baixa";
+}
 
+const habilidadesFaltantes = vagas.filter(requisitos => {
+  // O símbolo ! (NÃO) inverte o resultado:
+
+  return !minhaGeladeira.includes(requisitos)// Queremos os requisitos que ele NÃO tem
+});
+
+console.log(habilidadesFaltantes); // Resultado:os requitos que estão faltando
+
+const porcentagem = (porcentagemDoCandidato / combatibilidadeDoCandidato.length) * 100;// Calcula a proporção em formato de percentual
 return `${porcentagem.toFixed(0)}%`;

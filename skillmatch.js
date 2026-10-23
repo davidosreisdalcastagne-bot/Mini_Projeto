@@ -1,41 +1,22 @@
-
 const vagas = [
-  { empresa: "Nubank",
-    cargo: "Front-End Jr",
-    requisitos: ["HTML", "CSS", "Javascript"] },
+  { empresa: "Nubank", cargo: "Front-End Jr", requisitos: ["HTML", "CSS", "Javascript"] },
+  { empresa: "Zup Innovation", cargo: "React JR", requisitos: ["JavaScript", "React", "TypeScript", "Git"] },
+  { empresa: "Mercado Livre", cargo: "Web Jr", requisitos: ["HTML", "JavaScript", "CSS", "React"] }
+]; // array das vagas com as informações de cada empresa
 
-  { empresa: "Zup Innovation",
-    cargo: "React JR",
-    requisitos: ["JavaScript", "React", "TypeScript","Git" ] },
-
-  { empresa: "Mercado Livre",
-    cargo: "Web Jr",
-    requisitos: ["HTML", "JavaScript", "CSS", "React"] }
-];//array das vagas com as informações de cada empresa
- 
 function buscarVagasDoServidor() {
   return new Promise((resolve, reject) => {
-    console.log("Buscando vagas no servidor...");// se a busca der certo mostra essa mensagem
+    console.log("Buscando vagas no servidor..."); // se a busca der certo mostra essa mensagem
     setTimeout(() => {
       if (vagas && vagas.length > 0) {
         resolve(vagas); // Retorna o array de vagas criado acima
       } else {
-        reject("Erro: Não foi possível carregar as vagas do servidor.");//caso dê erro mostra essa mensagem
+        reject("Erro: Não foi possível carregar as vagas do servidor."); // caso dê erro mostra essa mensagem
       }
     }, 2000);
   });
 }
 
-async function iniciarSimulador() {
-  try {
-    const vagasCarregadas = await buscarVagasDoServidor();
-    console.log("Vagas carregadas com sucesso! Total de vagas:", vagasCarregadas.length);
-    console.log(vagasCarregadas);
-
-  } catch (e) {
-    console.error("Falha ao iniciar o sistema:" + e,);//caso dê erro mostra essa mensagem
-  }
-}
 class Candidato {
   constructor(nome, idade, area, experiencia, habilidades) {
     this.nome = nome;
@@ -46,7 +27,7 @@ class Candidato {
   }
 
   apresentar() {
-    console.log(`Olá, sou ${this.nome}, tenho ${this.idade} anos e sou ${this.area}.`);//método que faz a apresentação do candidato
+    console.log(`Olá, sou ${this.nome}, tenho ${this.idade} anos e sou ${this.area}.`); // método que faz a apresentação do candidato
   }
 }
 
@@ -55,7 +36,45 @@ class CandidatoFrontEnd extends Candidato {
     super(nome, idade, area, experiencia, habilidades);
     this.portfolio = portfolio;
   }
+
+  // Método que analisa uma vaga específica recebida como parâmetro
+  calcularCompatibilidade(requisitosDaVaga) {
+    let porcentagemDoCandidato = 0; // cria contador que armazena a quantidade de requisitos preenchidos
+
+    // Analisa cada requisito da vaga individualmente
+    requisitosDaVaga.forEach(requisito => {
+      if (this.habilidades.includes(requisito)) {
+        porcentagemDoCandidato++; // Incrementa o contador em +1
+      }
+    });
+
+    // Calcula a proporção em formato de percentual antes de comparar nas condicionais
+    const porcentagem = (porcentagemDoCandidato / requisitosDaVaga.length) * 100;
+
+    let mencao = "";
+    if (porcentagem >= 80) {
+      mencao = "Alta";
+    } else if (porcentagem >= 50) {
+      mencao = "Média";
+    } else {
+      mencao = "Baixa";
+    }
+
+    // Filtra os requisitos que o candidato NÃO possui para esta vaga
+    const habilidadesFaltantes = requisitosDaVaga.filter(requisito => {
+      return !this.habilidades.includes(requisito); // Queremos os requisitos que ele NÃO tem
+    });
+
+    // Retorna um objeto consolidado com todas as informações calculadas
+    return {
+      porcentagem: porcentagem,
+      porcentagemFormatada: `${porcentagem.toFixed(0)}%`,
+      classificacao: mencao,
+      faltantes: habilidadesFaltantes
+    };
+  }
 }
+
 const davi = new CandidatoFrontEnd(
   "Davi dos Reis",
   35,
@@ -63,32 +82,43 @@ const davi = new CandidatoFrontEnd(
   "1 ano",
   ["Javascript", "HTML", "CSS"],
   "https://github.com/davidosreisdalcastagne"
-);//nova instância da classe CandidatoFrontEnd comsuas informações
+); // nova instância da classe CandidatoFrontEnd com suas informações
+
 davi.apresentar(); // Chama o método apresentar() da instância 'davi'
 
-let porcentagemDoCandidato = 0;// cria contador que armazena a quantidades de requisitos preenchidos
-//Analisa cada requisito da vaga individualmente
-combatibilidadeDoCandidato.forEach(requisitos => {
-  if(this.habilidades.includes(requisitos )) {
-porcentagemDoCandidato++;// Incrementa o contador em +1
-  }
-});
+async function iniciarSimulador() {
+  try {
+    const vagasCarregadas = await buscarVagasDoServidor();
+    console.log("Vagas carregadas com sucesso! Total de vagas:", vagasCarregadas.length);
 
-if (nota >= 80) {
-  mencao = "Alta";
-} else if (nota >= 50) {
-  mencao = "Média";
-} else {
-  mencao = "Baixa";
+    // Mapeia cada vaga calculando sua análise individual através do candidato
+    const vagasAnalisadas = vagasCarregadas.map(vaga => {
+      const analise = davi.calcularCompatibilidade(vaga.requisitos);
+      return {
+        empresa: vaga.empresa,
+        cargo: vaga.cargo,
+        porcentagem: analise.porcentagem,
+        porcentagemFormatada: analise.porcentagemFormatada,
+        classificacao: analise.classificacao,
+        faltantes: analise.faltantes
+      };
+    });
+
+    console.log("Análise Individual das Vagas para o candidato...");
+    console.log(vagasAnalisadas);
+
+    // Encontra a vaga com maior compatibilidade comparando as porcentagens
+    const empregoMaisCompativel = vagasAnalisadas.reduce((melhorAteAgora, vagaAtual) => {
+      return (vagaAtual.porcentagem > melhorAteAgora.porcentagem) ? vagaAtual : melhorAteAgora;
+    });
+
+    console.log("\n--- Vaga Mais Compatível ---");
+    console.log(empregoMaisCompativel);
+
+  } catch (e) {
+    console.error("Falha ao iniciar o sistema: " + e); // caso dê erro mostra essa mensagem
+  }
 }
 
-const habilidadesFaltantes = vagas.filter(requisitos => {
-  // O símbolo ! (NÃO) inverte o resultado:
-
-  return !minhaGeladeira.includes(requisitos)// Queremos os requisitos que ele NÃO tem
-});
-
-console.log(habilidadesFaltantes); // Resultado:os requitos que estão faltando
-
-const porcentagem = (porcentagemDoCandidato / combatibilidadeDoCandidato.length) * 100;// Calcula a proporção em formato de percentual
-return `${porcentagem.toFixed(0)}%`;
+// Executa a função assíncrona principal do simulador
+iniciarSimulador();

@@ -37,6 +37,14 @@ class CandidatoFrontEnd extends Candidato {
     this.portfolio = portfolio;
   }
 
+  // Método que aceita uma vaga e uma função de callback
+  candidatarSe(vaga, callbackNotificacao) {
+    console.log(`\nEnviando currículo para a empresa ${vaga.empresa}...`);
+    
+    // Executa o callback passando os dados da vaga
+    callbackNotificacao(vaga.cargo, vaga.empresa);
+  }
+
   // Método que analisa uma vaga específica recebida como parâmetro
   calcularCompatibilidade(requisitosDaVaga) {
     let porcentagemDoCandidato = 0; // cria contador que armazena a quantidade de requisitos preenchidos
@@ -48,7 +56,7 @@ class CandidatoFrontEnd extends Candidato {
       }
     });
 
-    // Calcula a proporção em formato de percentual antes de comparar nas condicionais
+    // Calcula a proporção em formato de percentual
     const porcentagem = (porcentagemDoCandidato / requisitosDaVaga.length) * 100;
 
     let mencao = "";
@@ -75,51 +83,6 @@ class CandidatoFrontEnd extends Candidato {
   }
 }
 
-const davi = new CandidatoFrontEnd(
-  "Davi dos Reis",
-  35,
-  "desenvolvedor Front-end",
-  "1 ano",
-  ["Javascript", "HTML", "CSS"],
-  "https://github.com/davidosreisdalcastagne"
-); // nova instância da classe CandidatoFrontEnd com suas informações
-
-davi.apresentar(); // Chama o método apresentar() da instância 'davi'
-
-async function iniciarSimulador() {
-  try {
-    const vagasCarregadas = await buscarVagasDoServidor();
-    console.log("Vagas carregadas com sucesso! Total de vagas:", vagasCarregadas.length);
-
-    // Mapeia cada vaga calculando sua análise individual através do candidato
-    const vagasAnalisadas = vagasCarregadas.map(vaga => {
-      const analise = davi.calcularCompatibilidade(vaga.requisitos);
-      return {
-        empresa: vaga.empresa,
-        cargo: vaga.cargo,
-        porcentagem: analise.porcentagem,
-        porcentagemFormatada: analise.porcentagemFormatada,
-        classificacao: analise.classificacao,
-        faltantes: analise.faltantes
-      };
-    });
-
-    console.log("Análise Individual das Vagas para o candidato...");
-    console.log(vagasAnalisadas);
-
-    // Encontra a vaga com maior compatibilidade comparando as porcentagens
-    const empregoMaisCompativel = vagasAnalisadas.reduce((melhorAteAgora, vagaAtual) => {
-      return (vagaAtual.porcentagem > melhorAteAgora.porcentagem) ? vagaAtual : melhorAteAgora;
-    });
-
-    console.log("\n--- Vaga Mais Compatível ---");
-    console.log(empregoMaisCompativel);
-
-  } catch (e) {
-    console.error("Falha ao iniciar o sistema: " + e); // caso dê erro mostra essa mensagem
-  }
-}
-
 // Exemplos das sugestões de recursos para cada tecnologia
 const sugestoesDeCursos = {
   "React": "Curso 'React Completo' na Origamid ou Documentação Oficial (react.dev)",
@@ -128,10 +91,11 @@ const sugestoesDeCursos = {
   "CSS": "Formação CSS Grid e Flexbox da Alura"
 };
 
+// Função que gera a recomendação de estudos
 function gerarRecomendacaoComCurso(habilidadesFaltantes) {
   if (habilidadesFaltantes.length === 0) {
-    return "Você já possui todas as habilidades necessárias! Mantenha os estudos atualizados praticando projetos reais.";
-  }//mensagem dada caso o candidato tenha todas ashabilidades necessárias
+    return "Você já possui todas as habilidades necessárias! Mantenha os estudos atualizados praticando projetos reais."; // mensagem dada caso o candidato tenha todas as habilidades necessárias
+  }
 
   // Gera uma lista formatada indicando a tecnologia e o curso sugerido
   const listaRecomendacoes = habilidadesFaltantes.map(habilidade => {
@@ -143,11 +107,77 @@ function gerarRecomendacaoComCurso(habilidadesFaltantes) {
   return `Para se adequar 100% a esta vaga, recomendamos os seguintes caminhos de estudo:\n` + listaRecomendacoes.join("\n");
 }
 
-// Exemplo de aplicação
-const habilidadesFaltantes = analise.faltantes; // Pega o array de faltantes já calculado
-const recomendacao = davi.gerarRecomendacaoEstudo(habilidadesFaltantes);
+// Função externa que cria o Closure
+function criarContadorDeCandidaturas() {
+  let totalCandidaturas = 0; // Armazena a contagem total na memória
 
-console.log(recomendacao);
+  // Retorna a função interna que acessa o contador
+  return function(nomeDaVaga) {
+    totalCandidaturas++;
+    console.log(`Candidatura nº ${totalCandidaturas} registrada para a vaga: ${nomeDaVaga}`);
+  };
+}
+
+// Função de Callback para mostrar a confirmação
+function mostrarConfirmacao(cargo, empresa) {
+  console.log(`[NOTIFICAÇÃO]: Candidatura para ${cargo} na ${empresa} foi enviada com sucesso!`); // exibe mensagem de sucesso da candidatura
+}
+
+const davi = new CandidatoFrontEnd(
+  "Davi dos Reis",
+  35,
+  "desenvolvedor Front-end",
+  "1 ano",
+  ["Javascript", "HTML", "CSS"],
+  "https://github.com/davidosreisdalcastagne"
+); // nova instância da classe CandidatoFrontEnd com suas informações
+
+davi.apresentar(); // Chama o método apresentar() da instância 'davi'
+
+// Inicializa a função de Closure
+const registrarCandidatura = criarContadorDeCandidaturas();
+
+async function iniciarSimulador() {
+  try {
+    const vagasCarregadas = await buscarVagasDoServidor();
+    console.log("\nVagas carregadas com sucesso! Total de vagas:", vagasCarregadas.length);
+
+    // Mapeia cada vaga calculando sua análise individual
+    const vagasAnalisadas = vagasCarregadas.map(vaga => {
+      const analise = davi.calcularCompatibilidade(vaga.requisitos);
+      const recomendacao = gerarRecomendacaoComCurso(analise.faltantes);
+
+      // Registra a análise no contador do Closure
+      registrarCandidatura(`${vaga.cargo} - ${vaga.empresa}`);
+
+      return {
+        empresa: vaga.empresa,
+        cargo: vaga.cargo,
+        porcentagem: analise.porcentagem,
+        porcentagemFormatada: analise.porcentagemFormatada,
+        classificacao: analise.classificacao,
+        faltantes: analise.faltantes,
+        recomendacaoEstudo: recomendacao
+      };
+    });
+
+    console.log("\nAnálise Individual das Vagas para o candidato...");
+    console.log(vagasAnalisadas);
+
+    // Encontra a vaga com maior compatibilidade
+    const empregoMaisCompativel = vagasAnalisadas.reduce((melhorAteAgora, vagaAtual) => {
+      return (vagaAtual.porcentagem > melhorAteAgora.porcentagem) ? vagaAtual : melhorAteAgora;
+    });
+
+    console.log("\n Vaga Mais Compatível para o candidato:");
+    console.log(empregoMaisCompativel);
+    // Envia a candidatura da vaga campeã usando o Callback
+    davi.candidatarSe(empregoMaisCompativel, mostrarConfirmacao);
+
+  } catch (e) {
+    console.error("Falha ao iniciar o sistema: " + e); // caso dê erro mostra essa mensagem
+  }
+}
 
 // Executa a função assíncrona principal do simulador
 iniciarSimulador();

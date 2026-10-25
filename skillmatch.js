@@ -120,5 +120,34 @@ async function iniciarSimulador() {
   }
 }
 
+// Exemplos das sugestões de recursos para cada tecnologia
+const sugestoesDeCursos = {
+  "React": "Curso 'React Completo' na Origamid ou Documentação Oficial (react.dev)",
+  "TypeScript": "Curso 'TypeScript do Zero' na Udemy ou Origamid",
+  "Git": "Curso gratuito 'Git e GitHub para Iniciantes' no YouTube (Curso em Vídeo)",
+  "CSS": "Formação CSS Grid e Flexbox da Alura"
+};
+
+function gerarRecomendacaoComCurso(habilidadesFaltantes) {
+  if (habilidadesFaltantes.length === 0) {
+    return "Você já possui todas as habilidades necessárias! Mantenha os estudos atualizados praticando projetos reais.";
+  }//mensagem dada caso o candidato tenha todas ashabilidades necessárias
+
+  // Gera uma lista formatada indicando a tecnologia e o curso sugerido
+  const listaRecomendacoes = habilidadesFaltantes.map(habilidade => {
+    // Busca a indicação nos exemplos e usa um recurso padrão caso ela não seja cadastrada
+    const cursoSugerido = sugestoesDeCursos[habilidade] || `Busque cursos de ${habilidade} na Alura ou Udemy`;
+    return `- ${habilidade}: ${cursoSugerido}`;
+  });
+
+  return `Para se adequar 100% a esta vaga, recomendamos os seguintes caminhos de estudo:\n` + listaRecomendacoes.join("\n");
+}
+
+// Exemplo de aplicação
+const habilidadesFaltantes = analise.faltantes; // Pega o array de faltantes já calculado
+const recomendacao = davi.gerarRecomendacaoEstudo(habilidadesFaltantes);
+
+console.log(recomendacao);
+
 // Executa a função assíncrona principal do simulador
 iniciarSimulador();

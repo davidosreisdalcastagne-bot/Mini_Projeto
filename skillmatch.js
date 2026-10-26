@@ -1,5 +1,5 @@
 const vagas = [
-  { empresa: "Nubank", cargo: "Front-End Jr", requisitos: ["HTML", "CSS", "Javascript"] },
+  { empresa: "Nubank", cargo: "Front-End Jr", requisitos: ["HTML", "CSS", "JavaScript"] },
   { empresa: "Zup Innovation", cargo: "React JR", requisitos: ["JavaScript", "React", "TypeScript", "Git"] },
   { empresa: "Mercado Livre", cargo: "Web Jr", requisitos: ["HTML", "JavaScript", "CSS", "React"] }
 ]; // array das vagas com as informações de cada empresa
@@ -128,7 +128,7 @@ const davi = new CandidatoFrontEnd(
   35,
   "desenvolvedor Front-end",
   "1 ano",
-  ["Javascript", "HTML", "CSS"],
+  ["JavaScript", "HTML", "CSS"],
   "https://github.com/davidosreisdalcastagne"
 ); // nova instância da classe CandidatoFrontEnd com suas informações
 
